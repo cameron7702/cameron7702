@@ -1,4 +1,4 @@
-#name(String), bio (String), program (String), admissions_avg (integer), tuition_cost(integer), city_pop (integer), uni_pop (integer), vibe_hours (integer, average time spent partying per week from a survey)
+#name(String), bio (String), program (String), admissions_avg (integer), tuition_cost(integer), city_pop (integer), university_pop (integer), vibe_hours (integer, average time spent partying per week from a survey)
 def create_university(university_id, name, bio, program, admissions_avg, tuition_cost, city_pop, uni_pop, vibe_hours):
     
     uni_dict = {
