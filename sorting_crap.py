@@ -1,126 +1,105 @@
 import math, requests
 
-test_unis = []
 people = []
 
 # pip install requests
-
 import requests
 
 email_address = "praxiscandie@gmail.com"
 password = "praxiscandie2021"
 
-r = requests.get("https://api.apispreadsheets.com/data/6639/")
+user_uni_sheet = "6647/"
+user_info_sheet = "6648/"
+uni_info_sheet = "6649/"
+
+r = requests.get("https://api.apispreadsheets.com/data/" + uni_info_sheet)
 
 if r.status_code == 200:
     print("SUCCESS")
-    students_data = r.json()
-    print(students_data)
+    universities = r.json()["data"]
 else:
-    print("FUCKING SHIT")
+    print("OOF")
 
+r2 = requests.get("https://api.apispreadsheets.com/data/" + user_info_sheet)
 
-#person_id (String), program_interests (array of [Engineering, Computer Science, Arts, Business, Science]), academic_avg (integer), budget (integer), city_size (array of ["Small", "Medium", "Large"]), uni_size (array of ["Small", "Medium", "Large"]), vibe_level (integer, hours of expected partying per week)
-def create_person(person_id, program_interests, academic_avg, budget, city_size, uni_size, vibe_level):
-    person_dict = {
-        "id" : person_id,
-        "program_interests" : program_interests,
-        "avg" : academic_avg,
-        "budget" : budget,
-        "city_size" : city_size,
-        "uni_size" : uni_size,     
-        "vibe_level" : vibe_level,
-    }
-    return person_dict
-
-#name(String), bio (String), program (String), admissions_avg (integer), tuition_cost(integer), city_pop (integer), uni_pop (integer), vibe_hours (integer)
-def create_university(university_id, name, bio, program, admissions_avg, tuition_cost, city_pop, uni_pop, vibe_hours):
-    uni_dict = {
-        "id" : university_id,
-        "name" : name,
-        "bio" : bio,
-        "program" : program,
-        "avg" : admissions_avg,
-        "cost" : tuition_cost,
-        "city_pop" : city_pop,
-        "uni_pop" : uni_pop,
-        "vibe_hours" : vibe_hours
-    }
-    return uni_dict
-
-people.append(create_person(69, ["Engineering", "CompSci", "Arts", "Science", "Business"], 92, 12000, ["Small", "Medium"], ["Medium", "Large"], 7))
-
-'''
-def create_person(person_id, program_interests, academic_avg, budget, city_size, uni_size, vibe_level):
-    person_dict = {
-        "id" : person_id,
-        "program_interests" : program_interests,
-        "avg" : academic_avg,
-        "budget" : budget,
-        "city_size" : city_size,
-        "uni_size" : uni_size,     
-        "vibe_level" : vibe_level,
-    }
-    return person_dict
-    
-def create_university(university_id, name, bio, program, admissions_avg, tuition_cost, pop_density, uni_pop, uni_rank, vibe_hours):
-    uni_dict = {
-        "id" : university_id,
-        "name" : name,
-        "bio" : bio,
-        "program" : program,
-        "avg" : admissions_avg,
-        "cost" : tuition_cost,
-        "pop_dens" : pop_density,
-        "uni_pop" : uni_pop,
-        "vibe_hours" : vibe_hours
-    }
-    return uni_dict
-'''
+if(r.status_code == 200):
+    print("#2 SUCCESS")
+    users = r2.json()["data"]
+else:
+    print(r.status_code)
+    print("FUCK THIS SHIT FUCK FUCK FUCK")
 
 #returns a list of sorted universities
 def get_match_list(person_id):
 
     matching_list = []
-    person_dict = {}
-    for person in people:
-        if person_id == person["id"]:
-            person_dict = person
-            
-    for uni in test_unis:
-        uni_score = 0.0
+    temp = users[int(person_id) - 1]
+    print(temp)
+    program_interests = [temp["Program 1"], temp["Program 2"], temp["Program 3"], temp["Program 4"], temp["Program 5"]]
+
+    person_dict = {"program_interests" : program_interests, "sat" : int(temp["Sat"]), "gpa" : float(temp["Admissions_avg"]), "budget" : int(temp["Tuition Cost"])}
+    person_dict["city_size"] = temp["City size"]
+    person_dict["uni_pop"] = temp["Uni size"]
+    person_dict["vibe_level"] = float(temp["Vibe level"])
+
+    for uni_id, uni in enumerate(universities):
         
-        # academic avg --> max 25%
+        uni_score = 0.0
+        person_avg = 0.0
+        
+        #convert SAT scores into percentiles (2020 statistics)
+        if person_dict["sat"] >= 1550:
+            person_avg = 99
+        if person_dict["sat"] < 1550 and person_dict["sat"] >= 1500:
+            person_avg = 98
+        if person_dict["sat"] < 1500 and person_dict["sat"] >= 1450:
+            person_avg = 97
+        if person_dict["sat"] < 1450 and person_dict["sat"] >= 1400:
+            person_avg = 95
+        if person_dict["sat"] < 1400 and person_dict["sat"] >= 1350:
+            person_avg = 93
+        if person_dict["sat"] < 1350 and person_dict["sat"] >= 1300:
+            person_avg = 88
+        if person_dict["sat"] < 1300 and person_dict["sat"] >= 1250:
+            person_avg = 84
+        if person_dict["sat"] < 1250 and person_dict["sat"] >= 1200:
+            person_avg = 78
+        if person_dict["sat"] < 1200 and person_dict["sat"] >= 1150:
+            person_avg = 70
+        if person_dict["sat"] < 1150 and person_dict["sat"] >= 1000:
+            person_avg = 65
+        else:
+            person_avg = 55
+
+        #in order to get a personal average application percentage, average the SAT percentile and GPA score percentage 
+        person_avg = (person_avg + person_dict["gpa"])/2
+
+        # academic avg --> max 25% 
         # exponential multiplier takes into account that if your average is higher than the uni's requirements
-        # you will be more likely to apply than if your average was lower 
-
-        print(uni)
-        avg_dif = abs(person_dict["avg"] - uni["avg"])
-        exponential_multiplier = 0.7 * (person_dict["avg"] > uni["avg"]) + 1.1 * (person_dict["avg"] < uni["avg"]) 
+        # you will be more likely to apply than if your average was lower
+        avg_dif = abs(person_avg - float(uni["avg"]))
+        exponential_multiplier = 0.7 * (person_avg > float(uni["avg"])) + 1.1 * (person_avg < float(uni["avg"])) 
         uni_score += 25 - (avg_dif > 5) * abs(avg_dif - 5) ** exponential_multiplier
-        print("1", uni_score)
-
 
         # program interests --> max 30%
+        # calculate the match based on how the applicant ranks their program choices
         for cnt, program in enumerate(person_dict["program_interests"]):
             if program == uni["program"]:
                 uni_score += 30 - cnt ** math.log(30, 4)
-        print("2", uni_score)
 
             
         # budget --> max 20%
-        budget_dif = abs(person_dict["budget"] - uni["cost"])
+        budget_dif = abs(int(person_dict["budget"]) - int(uni["tuition"]))
         uni_score += 20
-        if person_dict["budget"] < uni["cost"]:
+        if int(person_dict["budget"]) < int(uni["tuition"]):
             uni_score -= (budget_dif > 3000) * (abs((3000 - budget_dif) / 2000) ** 1.1)
-        print("3", uni_score)
+
 
         # population density --> max 5%
         # small_city: 0-100000, medium_city: 100001-250000, big_city: 250000+
-        #city_size = None
-        if uni["city_pop"] <= 100000:
+        if int(uni["city_pop"]) <= 100000:
             city_size = "Small"
-        if uni["city_pop"] > 100000 and uni["city_pop"] <= 250000:
+        if int(uni["city_pop"]) > 100000 and int(uni["city_pop"]) <= 250000:
             city_size = "Medium"
         else:
             city_size = "Large"
@@ -129,36 +108,37 @@ def get_match_list(person_id):
             uni_score += 5
         else:
             uni_score += 0
-        print("4", uni_score)
 
 
         # uni size --> max 5%
         # small_uni: 0-5000, medium_uni: 5000-15000, big_uni: 15000+
-        #uni_size = None
-        if uni["uni_pop"] <= 5000:
+        if int(uni["uni_pop"]) <= 5000:
             uni_size = "Small"
-        if uni["uni_pop"] > 5000 and uni["uni_pop"] <= 15000:
+        if int(uni["uni_pop"]) > 5000 and int(uni["uni_pop"]) <= 15000:
             uni_size = "Medium"
         else:
             uni_size = "Large"
         
-        if uni_size in person_dict["uni_size"]:
+        if uni_size in person_dict["uni_pop"]:
             uni_score += 5
         else:
             uni_score += 0
-        print("5", uni_score)
 
-
-        #vibe check --> max 15%
+        # vibe check --> max 15%
         # same approach as academic avg
-        vibe_dif = abs(person_dict["vibe_level"] - uni["vibe_hours"])
+        vibe_dif = abs(float(person_dict["vibe_level"]) - float(uni["vibe_hours"]))
         uni_score += 15 - (vibe_dif > 3) * (vibe_dif - 3) * 1.41
+        
 
-        #add to matching_list, how
-        matching_list.append([int(uni_score), uni["id"]])
-        print("6", uni_score)
-        print('\n')
+        matching_list.append([int(uni_score), uni_id])
+  
+    sorted(matching_list, reverse = True)
 
-    return sorted(matching_list, reverse = True)
+    r3 = requests.get("https://api.apispreadsheets.com/data/" + user_uni_sheet)
+    user_data = r3.json()
+    user_data["data"][1]["ID"] = 500
 
-#print(get_match_list(69))
+    r4 = requests.post("https://api.apispreadsheets.com/data/" + user_uni_sheet, headers={}, json={"data": {"ID":"500"}, "query": "select*from6647whereID='1'"})
+    print(r4)
+
+print(get_match_list(1))
