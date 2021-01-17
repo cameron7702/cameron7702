@@ -1,7 +1,24 @@
-import math,
+import math, requests
 
 test_unis = []
 people = []
+
+# pip install requests
+
+import requests
+
+email_address = "praxiscandie@gmail.com"
+password = "praxiscandie2021"
+
+r = requests.get("https://api.apispreadsheets.com/data/6639/")
+
+if r.status_code == 200:
+    print("SUCCESS")
+    students_data = r.json()
+    print(students_data)
+else:
+    print("FUCKING SHIT")
+
 
 #person_id (String), program_interests (array of [Engineering, Computer Science, Arts, Business, Science]), academic_avg (integer), budget (integer), city_size (array of ["Small", "Medium", "Large"]), uni_size (array of ["Small", "Medium", "Large"]), vibe_level (integer, hours of expected partying per week)
 def create_person(person_id, program_interests, academic_avg, budget, city_size, uni_size, vibe_level):
@@ -32,34 +49,6 @@ def create_university(university_id, name, bio, program, admissions_avg, tuition
     return uni_dict
 
 people.append(create_person(69, ["Engineering", "CompSci", "Arts", "Science", "Business"], 92, 12000, ["Small", "Medium"], ["Medium", "Large"], 7))
-
-
-#Engineering
-test_unis.append(create_university(1, "UofT", "Harvard of the North", "Engineering", 93, 14200, 4334, 61690, 3))
-test_unis.append(create_university(2, "Ryerson", "Uni atop of a Canadian Tire", "Engineering", 70, 6000, 4334, 36400, 4.4))
-test_unis.append(create_university(3, "UWaterloo", "Sadness", "Engineering", 100, 16000, 4334, 41000, 3.4))
-test_unis.append(create_university(4, "Queens", "Party school", "Engineering", 80, 7000, 4334, 24100, 8.5))
-
-#CompSci
-test_unis.append(create_university(5, "UofT", "Harvard of the North", "CompSci", 90, 17000, 4334, 61690, 3))
-test_unis.append(create_university(6, "Ryerson", "Uni atop of a Canadian Tire", "CompSci", 80, 6000, 4334, 36400, 4.4))
-test_unis.append(create_university(7, "UWaterloo", "Sadness", "CompSci", 95, 16000, 4334, 41000, 3.4))
-test_unis.append(create_university(8, "Queens", "Party school", "CompSci", 70, 7000, 4334, 24100, 8.5))
-
-#Arts
-test_unis.append(create_university(9, "UofT", "Harvard of the North", "Arts", 70, 17000, 4334, 61690, 3))
-test_unis.append(create_university(10, "Queens", "Party school", "Arts", 60, 7000, 4334, 24100, 8.5))
-
-#Business
-test_unis.append(create_university(11, "UofT", "Harvard of the North", "Business", 90, 17000, 4334, 61690, 3))
-test_unis.append(create_university(12, "Ryerson", "Uni atop of a Canadian Tire", "Business", 85, 6000, 4334, 36400, 4.4))
-test_unis.append(create_university(13, "Queens", "Party school", "Business", 80, 7000, 4334, 24100, 8.5))
-
-#Science
-test_unis.append(create_university(14, "UofT", "Harvard of the North", "Science", 75, 17000, 4334, 61690, 3))
-test_unis.append(create_university(15, "Ryerson", "Uni atop of a Canadian Tire", "Science", 65, 6000, 4334, 36400, 4.4))
-test_unis.append(create_university(16, "UWaterloo", "Sadness", "Science", 75, 10000, 4334, 41000, 3.4))
-test_unis.append(create_university(17, "Queens", "Party school", "Science", 70, 7000, 4334, 24100, 8.5))
 
 '''
 def create_person(person_id, program_interests, academic_avg, budget, city_size, uni_size, vibe_level):
@@ -172,4 +161,4 @@ def get_match_list(person_id):
 
     return sorted(matching_list, reverse = True)
 
-print(get_match_list(69))
+#print(get_match_list(69))
