@@ -129,17 +129,27 @@ def get_match_list(person_id):
         vibe_dif = abs(float(person_dict["vibe_level"]) - float(uni["vibe_hours"]))
         uni_score += 15 - (vibe_dif > 3) * (vibe_dif - 3) * 1.41
         
-
-        matching_list.append([int(uni_score), uni_id])
+        matching_list.append((int(uni_score), uni_id))
   
-    sorted(matching_list, reverse = True)
+    matching_list.sort(reverse = True)
+    
+    uni_dict = {"id" : person_id}
+
+    print(matching_list)
+
+    for cnt, uni in enumerate(matching_list):
+        uni_dict[str(cnt + 1)] = str(uni[1] + 1)
+
+    #print(uni_dict)
 
     r3 = requests.get("https://api.apispreadsheets.com/data/" + user_uni_sheet)
-    user_data = r3.json()
-    user_data["data"][1]["ID"] = 500
-    print(user_data)
+    check = True
+    for item in r3.json()["data"]:
+        if(int(item["ID"]) == int(person_id)):
+            check = False
 
-    r4 = requests.post("https://api.apispreadsheets.com/data/6647/", headers={}, json={"data": {"ID":"1"}, "query": "select*from6647whereID='5'"})
-    print(r4)
+    if(check):
+        r4 = requests.post("https://api.apispreadsheets.com/data/6647/", headers={}, json={"data": uni_dict})
+        print(r4)
 
-print(get_match_list(1))
+get_match_list(1)
