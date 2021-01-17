@@ -1,4 +1,4 @@
-import math, requests
+import math, requests, json
 
 people = []
 
@@ -137,8 +137,9 @@ def get_match_list(person_id):
     r3 = requests.get("https://api.apispreadsheets.com/data/" + user_uni_sheet)
     user_data = r3.json()
     user_data["data"][1]["ID"] = 500
+    print(user_data)
 
-    r4 = requests.post("https://api.apispreadsheets.com/data/" + user_uni_sheet, headers={}, json={"data": {"ID":"500"}, "query": "select*from6647whereID='1'"})
+    r4 = requests.post("https://api.apispreadsheets.com/data/6647/", headers={}, json={"data": {"ID":"1"}, "query": "select*from6647whereID='5'"})
     print(r4)
 
 print(get_match_list(1))
