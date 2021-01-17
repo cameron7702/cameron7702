@@ -12,7 +12,6 @@ html, body {
   overflow-x:hidden;
   position: relative;
   vertical-align: baseline;
-  background-image: url(tm-bg-slide-1.jpg), url(bg.png);
   background-blend-mode: multiply;
   background-repeat: no-repeat;
   background-position: center center;
